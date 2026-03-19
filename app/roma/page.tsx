@@ -125,7 +125,7 @@ function AdminContent({ onLogout }: { onLogout: () => void }) {
     setVehiclesLoading(true);
     const result = await getVehicles();
     if (result.success) {
-      setVehicles(result.data);
+      setVehicles(result.data || []);
     } else {
       setError(`Failed to load vehicles: ${result.error}`);
     }
@@ -136,7 +136,7 @@ function AdminContent({ onLogout }: { onLogout: () => void }) {
     setNewsLoading(true);
     const result = await getNews();
     if (result.success) {
-      setNews(result.data);
+      setNews(result.data || []);
     } else {
       setError(`Failed to load news: ${result.error}`);
     }
@@ -475,7 +475,7 @@ function VehicleForm({
   onSubmit: (data: any) => void;
   onCancel: () => void;
 }) {
-  const [formData, setFormData] = useState(
+  const [formData, setFormData] = useState<any>(
     vehicle || {
       name: "",
       category: "car",
@@ -495,9 +495,9 @@ function VehicleForm({
     }
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    await onSubmit(formData);
   };
 
   return (
@@ -724,7 +724,7 @@ function NewsForm({
   onSubmit: (data: any) => void;
   onCancel: () => void;
 }) {
-  const [formData, setFormData] = useState(
+  const [formData, setFormData] = useState<any>(
     newsItem || {
       title: "",
       content: "",
@@ -734,9 +734,9 @@ function NewsForm({
     }
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    await onSubmit(formData);
   };
 
   return (
