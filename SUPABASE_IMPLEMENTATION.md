@@ -2,17 +2,17 @@
 
 ## What's Been Set Up
 
-Your AutoSharm rental website now has full Supabase integration with a new admin panel at `/roma`.
+Your AutoSharm rental website now has full Supabase integration with admin panel at `/admin`.
 
 ### File Structure
 
 ```
 app/
-├── roma/                          # New admin panel at /roma
-│   ├── page.tsx                  # Roma Admin Dashboard (Supabase-powered)
+├── admin/                          # Admin panel at /admin
+│   ├── page.tsx                  # Admin Dashboard (Supabase-powered)
 │   └── layout.tsx
 ├── admin/
-│   ├── page.tsx                  # Old admin (disabled - use /roma instead)
+│   ├── page.tsx                  # Admin panel with Supabase integration
 │   ├── login.tsx
 │   ├── actions.ts                # Authentication
 │   └── db-actions.ts             # NEW: Supabase CRUD operations
@@ -163,9 +163,9 @@ All functions:
 
 ---
 
-## 5️⃣ Roma Admin Panel
+## 5️⃣ Admin Panel
 
-URL: `https://yoursite.com/roma`
+URL: `https://yoursite.com/admin`
 
 Features:
 - 🔐 Secure login (session-based)
@@ -253,7 +253,7 @@ ${vehicle.listingType === "rent" ? `/${vehicle.rentalPeriod}` : ""}
 
 - [ ] **7. Test it!**
   - Catalog: http://localhost:3000/catalog
-  - Admin: http://localhost:3000/roma
+  - Admin: http://localhost:3000/admin
 
 ---
 
@@ -414,4 +414,4 @@ interface NewsItem {
 
 ## 🎉 You're All Set!
 
-Your admin panel is now at `/roma` with full Supabase integration. Start adding vehicles and news!
+Your admin panel is now at `/admin` with full Supabase integration. Start adding vehicles and news!

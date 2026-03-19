@@ -114,7 +114,7 @@ npm run dev
 
 ### Test 2: Add-to-Cart Via Admin
 
-1. Open URL: http://localhost:3000/roma
+1. Open URL: http://localhost:3000/admin
 2. Login with:
    - Username: `admin`
    - Password: whatever you set in `.env.local`
@@ -129,7 +129,7 @@ npm run dev
 
 ### Test 3: Edit and Delete
 
-1. In admin (`/roma`), click edit ✏️ on a vehicle
+1. In admin (`/admin`), click edit ✏️ on a vehicle
 2. Change something (e.g., name)
 3. Click "Update Vehicle"
 4. Change should reflect immediately
@@ -181,7 +181,7 @@ After deployment, bookmark these:
 | Page | URL |
 |------|-----|
 | **Live Catalog** | https://yourdomain.com/catalog |
-| **Admin Panel** | https://yourdomain.com/roma |
+| **Admin Panel** | https://yourdomain.com/admin |
 | **Supabase Dashboard** | https://supabase.com/dashboard |
 | **This Guide** | `SUPABASE_IMPLEMENTATION.md` (in root) |
 
@@ -246,7 +246,7 @@ When adding vehicles, here's what each field means:
 Once everything works, you should see:
 
 - ✅ Local catalog loads vehicles from Supabase
-- ✅ Admin can add vehicles via `/roma`
+- ✅ Admin can add vehicles via `/admin`
 - ✅ New vehicles appear in catalog immediately
 - ✅ Admin can edit and delete vehicles
 - ✅ Prices show with correct currency (EGP or $)
@@ -283,7 +283,7 @@ Once you're comfortable with the basics:
 
 Your site now has:
 - ✅ Real database (Supabase)
-- ✅ Working admin panel (`/roma`)
+- ✅ Working admin panel (`/admin`)
 - ✅ Live catalog with database sync
 - ✅ Secure deployments
 - ✅ Ready for production!

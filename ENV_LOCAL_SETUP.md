@@ -31,7 +31,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ################################################################
 # ADMIN AUTHENTICATION
-# Choose your own password (used to login at /roma)
+# Choose your own password (used to login at /admin)
 ################################################################
 
 ADMIN_USERNAME=admin
@@ -91,7 +91,7 @@ npm run dev
 
 ### 2. Test Login
 
-1. Open http://localhost:3000/roma
+1. Open http://localhost:3000/admin
 2. Login with:
    - Username: `admin`
    - Password: whatever you set in `.env.local`
@@ -179,7 +179,7 @@ AutoSharm/
 
 Once `.env.local` is created and dev server is running:
 
-1. ✅ Test login at http://localhost:3000/roma
+1. ✅ Test login at http://localhost:3000/admin
 2. ✅ Add a vehicle in admin panel
 3. ✅ View it in catalog at http://localhost:3000/catalog
 4. ✅ Edit and delete to test all functions

@@ -2,7 +2,7 @@
 
 ## ✅ All TypeScript Errors Fixed!
 
-Your Roma admin panel at `/roma` is now fully typed and ready for testing. No compilation errors.
+Your admin panel at `/admin` is now fully typed and ready for testing. No compilation errors.
 
 ---
 
@@ -52,11 +52,11 @@ The app will run at `http://localhost:3000`
 
 ---
 
-## Phase 2: Admin Panel Testing (`/roma`)
+## Phase 2: Admin Panel Testing (`/admin`)
 
 ### Test 2.1: Login
 
-1. Navigate to `http://localhost:3000/roma`
+1. Navigate to `http://localhost:3000/admin`
 2. You should see login form
 3. Enter credentials:
    - Username: `admin`
@@ -209,7 +209,7 @@ For better testing, add 2-3 more vehicles:
 ### Test 4.1: Add in Admin → Verify in Catalog (Real-time)
 
 1. Keep two browser tabs/windows open:
-   - Tab A: Admin panel at `/roma`
+   - Tab A: Admin panel at `/admin`
    - Tab B: Catalog at `/catalog`
 2. In Tab A, add a new vehicle (e.g., "BMW M440i 2024")
 3. In Tab B, **refresh the page** (F5)
@@ -250,8 +250,8 @@ For better testing, add 2-3 more vehicles:
 
 ### Step 5.3: Test Live Admin
 
-1. Go to your live site URL + `/roma`
-2. Example: `https://your-autosharm.netlify.app/roma`
+1. Go to your live site URL + `/admin`
+2. Example: `https://your-autosharm.netlify.app/admin`
 3. Login with admin credentials
 4. Add new vehicle (e.g., "Mercedes E-Class 2024")
 5. Go to catalog: `/catalog`
@@ -289,7 +289,7 @@ For better testing, add 2-3 more vehicles:
 ## Success Checklist
 
 - ✅ TypeScript compilation passses
-- ✅ Admin panel (`/roma`) loads and authenticates
+- ✅ Admin panel (`/admin`) loads and authenticates
 - ✅ Can add vehicle in admin panel
 - ✅ Vehicle appears in Supabase table
 - ✅ Vehicle appears in catalog page
@@ -305,7 +305,7 @@ For better testing, add 2-3 more vehicles:
 
 ## What's Working Now
 
-✅ **Admin Panel at `/roma`**
+✅ **Admin Panel at `/admin`**
 - Authentication with secure session cookies
 - Vehicle CRUD (Create, Read, Update, Delete)
 - News CRUD

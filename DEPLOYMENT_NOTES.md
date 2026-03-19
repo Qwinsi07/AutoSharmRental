@@ -2,7 +2,7 @@
 
 ## 🎉 What's Been Delivered
 
-Your AutoSharm rental website now has a **complete Supabase backend** with a **secure admin panel at `/roma`**. Here's everything that's been set up:
+Your AutoSharm rental website now has a **complete Supabase backend** with a **secure admin panel at `/admin`**. Here's everything that's been set up:
 
 ---
 
@@ -33,9 +33,10 @@ Row Level Security (RLS):
 
 ---
 
-### ✅ 2. Admin Panel at `/roma`
+### ✅ 2. Admin Panel at `/admin`
 
-**New Location:** `https://yoursite.com/roma`
+**Location:** `app/admin/page.tsx`
+**URL:** `https://yoursite.com/admin`
 
 **Features:**
 - 🔐 Secure login (session-based, 8-hour timeout)
@@ -55,8 +56,8 @@ Row Level Security (RLS):
 - 🎨 Gold theme matching your brand
 
 **Files:**
-- `app/roma/page.tsx` - Dashboard interface
-- `app/roma/layout.tsx` - Layout wrapper
+- `app/admin/page.tsx` - Dashboard interface
+- `app/admin/layout.tsx` - Layout wrapper
 
 **Status:** ✅ Production-ready
 
@@ -208,7 +209,7 @@ npm run dev
 
 ### 6️⃣ Test Locally (5 min)
 ```
-1. http://localhost:3000/roma → Login
+1. http://localhost:3000/admin → Login
 2. Add a vehicle
 3. http://localhost:3000/catalog → Verify it appears
 ```
@@ -223,7 +224,7 @@ npm run dev
 
 ### 8️⃣ Test Live (2 min)
 ```
-1. yoursite.com/roma → Login
+1. yoursite.com/admin → Login
 2. yoursite.com/catalog → Verify
 ```
 
@@ -240,7 +241,7 @@ npm run dev
 │                                                      │
 │  PUBLIC ACCESS          ADMIN ACCESS                │
 │  ┌──────────────┐      ┌──────────────┐            │
-│  │   /catalog   │      │   /roma      │            │
+│  │   /catalog   │      │   /admin      │            │
 │  │  (Read-only) │      │ (Authenticated)           │
 │  └──────────────┘      └──────────────┘            │
 │         │                     │                     │
@@ -481,7 +482,7 @@ VISUAL_GUIDE.md
 After setup, you should have:
 
 - ✅ Database with 2 tables
-- ✅ Admin panel working at `/roma`
+- ✅ Admin panel working at `/admin`
 - ✅ Catalog showing Supabase data
 - ✅ Prices displaying correctly
 - ✅ CRUD operations working
@@ -535,7 +536,7 @@ Before going live:
 You now have:
 
 ✅ **Production-grade backend** (Supabase)  
-✅ **Secure admin panel** (/roma)  
+✅ **Secure admin panel** (/admin)
 ✅ **Real-time database** (PostgreSQL)  
 ✅ **Mobile-friendly interface**  
 ✅ **Scalable architecture**  

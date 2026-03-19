@@ -20,7 +20,7 @@ AutoSharm/
 │   │   └── layout.tsx
 │   │
 │   ├── 📁 admin/
-│   │   ├── page.tsx                 ❌ Old admin (don't use - use /roma)
+│   │   ├── page.tsx                 ✅ Admin panel interface
 │   │   ├── login.tsx                Shared login component
 │   │   ├── actions.ts               Authentication & session
 │   │   └── db-actions.ts            ⭐ NEW - Supabase CRUD operations
@@ -93,7 +93,7 @@ AutoSharm/
    
 6. TEST LOCALLY
    ↓
-   Visit /roma → login → add vehicle
+   Visit /admin → login → add vehicle
    Visit /catalog → see vehicle
    
 7. DEPLOY TO NETLIFY
@@ -104,7 +104,7 @@ AutoSharm/
    
 8. TEST LIVE
    ↓
-   Your domain /roma → login
+   Your domain /admin → login
    Your domain /catalog → see live data
 ```
 
@@ -117,8 +117,8 @@ AutoSharm/
 | `SQL_SCHEMA.sql` | Database tables & security | ✅ Ready to deploy |
 | `lib/supabase.ts` | Client configuration | ✅ Integrated |
 | `app/admin/db-actions.ts` | Database operations | ✅ Integrated |
-| `app/roma/page.tsx` | Admin panel interface | ✅ Integrated |
-| `app/roma/layout.tsx` | Admin panel layout | ✅ Integrated |
+| `app/admin/page.tsx` | Admin panel interface | ✅ Integrated |
+| `app/admin/layout.tsx` | Admin panel layout | ✅ Integrated |
 | `.env.example` | Environment template | ✅ Reference |
 | `QUICK_START.md` | 15-min setup guide | ✅ Read first! |
 | `SUPABASE_README.md` | Overview & summary | ✅ Reference |
@@ -270,7 +270,7 @@ ADMIN ACCESS (Authenticated)
 ## 📊 Data Flow - Admin Adds Vehicle
 
 ```
-1. Admin navigates to /roma
+1. Admin navigates to /admin
    ↓
 2. Browser checks session cookie
    ↓
@@ -328,7 +328,7 @@ ADMIN ACCESS (Authenticated)
 ### Local Testing
 
 - [ ] Visit http://localhost:3000/catalog (no errors)
-- [ ] Visit http://localhost:3000/roma (login page)
+- [ ] Visit http://localhost:3000/admin (login page)
 - [ ] Can login with your credentials
 - [ ] Can add a vehicle
 - [ ] Vehicle appears in table
@@ -348,7 +348,7 @@ ADMIN ACCESS (Authenticated)
 ### After Deployment
 
 - [ ] Visit yoursite.com/catalog (works)
-- [ ] Visit yoursite.com/roma (login page works)
+- [ ] Visit yoursite.com/admin (login page works)
 - [ ] Can login with credentials
 - [ ] Can add vehicle live
 - [ ] Vehicle appears in live catalog
@@ -360,7 +360,7 @@ ADMIN ACCESS (Authenticated)
 | Page | Local URL | Live URL |
 |------|-----------|----------|
 | **Catalog** | http://localhost:3000/catalog | https://yoursite.com/catalog |
-| **Admin Panel** | http://localhost:3000/roma | https://yoursite.com/roma |
+| **Admin Panel** | http://localhost:3000/admin | https://yoursite.com/admin |
 | **Supabase Dashboard** | - | https://supabase.com/dashboard |
 | **Netlify Dashboard** | - | https://app.netlify.com |
 
@@ -393,7 +393,7 @@ ADMIN ACCESS (Authenticated)
 ## 🎓 Key Takeaways
 
 ✅ **Database:** PostgreSQL hosted on Supabase  
-✅ **Admin Panel:** New URL at `/roma`  
+✅ **Admin Panel:** URL at `/admin`
 ✅ **Authentication:** Session-based (8-hour timeout)  
 ✅ **Frontend:** Fetches vehicles from Supabase  
 ✅ **Security:** RLS + session verification + environment variables  

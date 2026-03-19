@@ -15,8 +15,8 @@ Your AutoSharm rental website now has **full Supabase backend integration** with
 - ✅ Row Level Security policies
 - ✅ Performance indexes
 
-### 2. **Admin Panel** (`app/roma/`)
-- ✅ New secure path: `/roma` (was `/admin`)
+### 2. **Admin Panel** (`app/admin/`)
+- ✅ Secure path: `/admin` (original working route)
 - ✅ Database-powered CRUD operations
 - ✅ Vehicle management (Create, Read, Update, Delete)
 - ✅ News management (Create, Read, Update, Delete)
@@ -64,7 +64,7 @@ Follow `QUICK_START.md` (15 minutes):
 ```bash
 # Test locally
 npm run dev
-# Visit http://localhost:3000/roma (login & add vehicle)
+# Visit http://localhost:3000/admin (login & add vehicle)
 # Visit http://localhost:3000/catalog (see vehicle)
 ```
 
@@ -79,7 +79,7 @@ Website (Next.js)
     ├── Catalog Page
     │   └── reads vehicles from Supabase (via Anon Key)
     │
-    └── Admin Login (/roma)
+    └─ Admin Login (/admin)
         ├── session verification
         └── Supabase operations (CRUD via server actions)
         
@@ -123,7 +123,7 @@ Supabase Cloud Backend
 ### Admin Panel Components
 ```typescript
 // User submits form in browser
-/roma → page.tsx → form submission
+/admin → page.tsx → form submission
 
 // Calls server action
 → db-actions.ts → verifyAdminSession()
@@ -155,7 +155,7 @@ Supabase Cloud Backend
 
 ### Add a Vehicle (Admin)
 
-1. Navigate to: `https://yoursite.com/roma`
+1. Navigate to: `https://yoursite.com/admin`
 2. Login with credentials from `.env.local`
 3. Click "Add Vehicle"
 4. Fill in the form:
@@ -284,7 +284,7 @@ Next person who visits /catalog sees it
 ## 🧪 Testing Checklist
 
 - [ ] Catalog page loads without errors
-- [ ] Admin panel is accessible at `/roma`
+- [ ] Admin panel is accessible at `/admin`
 - [ ] Can login with admin credentials
 - [ ] Can add a vehicle
 - [ ] Vehicle appears in catalog immediately
@@ -323,7 +323,7 @@ Before going live:
 - [ ] Trigger deploy
 - [ ] Test live site
 - [ ] Add first batch of vehicles
-- [ ] Share `/roma` link with managers
+- [ ] Share `/admin` link with managers
 
 ---
 

@@ -14,8 +14,8 @@ Your AutoSharm rental website now has **complete Supabase integration** ready to
 - Includes: vehicles table, news table, security policies, triggers
 - Performance optimized with indexes
 
-### 2. **Admin Panel at `/roma`** ✅
-- URL: `yoursite.com/roma`
+### 2. **Admin Panel at `/admin`** ✅
+- URL: `yoursite.com/admin`
 - Features: Login, Add/Edit/Delete vehicles, News management
 - Real-time Supabase sync
 - Production-ready code
@@ -101,7 +101,7 @@ npm run dev
 
 **Step 6: Test Admin Panel**
 ```
-1. Open http://localhost:3000/roma
+1. Open http://localhost:3000/admin
 2. Login with:
    - Username: admin
    - Password: (your password from .env.local)
@@ -154,7 +154,7 @@ ADMIN_PASSWORD = your-secure-password
 
 **Step 4: Test Live Site**
 1. Visit `yourdomain.com/catalog` - See live catalog
-2. Visit `yourdomain.com/roma` - Login & test admin
+2. Visit `yourdomain.com/admin` - Login & test admin
 
 **✅ You're live!**
 
@@ -176,7 +176,7 @@ ADMIN_PASSWORD = your-secure-password
 | Page | URL | Purpose |
 |------|-----|---------|
 | Catalog (Live) | `yoursite.com/catalog` | Browse vehicles |
-| Admin Panel | `yoursite.com/roma` | Manage vehicles |
+| Admin Panel | `yoursite.com/admin` | Manage vehicles |
 | Supabase | `supabase.com/dashboard` | Database management |
 | Netlify | `app.netlify.com` | Deployment control |
 
@@ -187,7 +187,7 @@ Your Project Root
 ├── SQL_SCHEMA.sql                   ← Deploy to Supabase
 ├── lib/supabase.ts                  ← Client setup
 ├── app/admin/db-actions.ts          ← Database operations
-├── app/roma/page.tsx                ← New admin panel
+├── app/admin/page.tsx                ← Admin panel
 ├── app/catalog/page.tsx             ← Updated to use Supabase
 ├── .env.local                       ← CREATE THIS (not in git)
 ├── .env.example                     ← Reference template
@@ -234,7 +234,7 @@ Your Project Root
 - [ ] `.env.local` exists in project root
 - [ ] Contains all 4 required variables
 - [ ] Dev server runs without errors
-- [ ] Can login at `/roma`
+- [ ] Can login at `/admin`
 - [ ] Can add vehicle in admin
 - [ ] Vehicle appears in `/catalog`
 - [ ] Prices display correctly
@@ -249,7 +249,7 @@ Your Project Root
 
 ### After Deployment
 - [ ] `yoursite.com/catalog` loads without errors
-- [ ] `yoursite.com/roma` shows login page
+- [ ] `yoursite.com/admin` shows login page
 - [ ] Can login with credentials
 - [ ] Can add vehicle live
 - [ ] Vehicle appears in catalog
@@ -321,7 +321,7 @@ Start with **these in order**:
 1. Add your vehicle inventory via admin panel
 2. Test all CRUD operations
 3. Verify catalog displays correctly
-4. Share `/roma` link with team members
+4. Share `/admin` link with team members
 
 ### Medium Term (This Month)
 1. Train team on admin panel
@@ -387,7 +387,7 @@ Start with **these in order**:
 | Setup | 30 min | Follow QUICK_START.md |
 | Testing | 10 min | Test locally, then live |
 | Admin Setup | 30 min | Add your first vehicles |
-| Training | 1 hour | Train team on `/roma` |
+| Training | 1 hour | Train team on `/admin` |
 | **Total** | **~2 hours** | **Go live** ✅ |
 
 ---
@@ -399,7 +399,7 @@ Once everything is set up correctly, you should see:
 ✅ Catalog loads from Supabase  
 ✅ Prices show with EGP or $  
 ✅ Rental vehicles show /day or /month  
-✅ Admin can add vehicles from `/roma`  
+✅ Admin can add vehicles from `/admin`
 ✅ New vehicles appear instantly in catalog  
 ✅ Admin can edit and delete  
 ✅ Session authentication works  
@@ -422,7 +422,7 @@ A: Yes, Supabase has migration tools. Covered in docs.
 A: Supabase scales automatically. Just increase plan if needed.
 
 **Q: Can I add more admins?**  
-A: Yes, multiple admins can use same `/roma` URL (same login).
+A: Yes, multiple admins can use same `/admin` URL (same login).
 
 **Q: How do I see database errors?**  
 A: Check browser console (F12 → Console) and Supabase dashboard.
@@ -457,7 +457,7 @@ A: Yes! Supabase is enterprise-grade, encrypted, and backed up.
 - [ ] Netlify deployed successfully
 - [ ] Tested live site
 - [ ] Added first batch of vehicles
-- [ ] Shared `/roma` with team
+- [ ] Shared `/admin` with team
 - [ ] Verified catalog displays correctly
 - [ ] Created backup plan
 - [ ] Ready to go live! ✨
@@ -469,7 +469,7 @@ A: Yes! Supabase is enterprise-grade, encrypted, and backed up.
 Your AutoSharm rental website now has:
 
 ✅ Production-grade backend (Supabase PostgreSQL)  
-✅ Secure admin panel (`/roma`)  
+✅ Secure admin panel (`/admin`)
 ✅ Real-time data sync  
 ✅ Mobile-friendly interface  
 ✅ Security best practices  
