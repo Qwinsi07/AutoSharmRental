@@ -5,8 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { VehicleCard } from "@/components/vehicle-card";
-import { StoreProvider, useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
+import type { Vehicle } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -15,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Car, Bike, Search, Filter, X } from "lucide-react";
+import { Car, Bike, Search, X } from "lucide-react";
 
 function CatalogFilters({
   searchQuery,
@@ -123,7 +124,8 @@ function CatalogFilters({
 function CatalogContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { vehicles } = useStore();
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Get filters from URL params
   const urlCategory = searchParams.get("category") || "all";
@@ -134,6 +136,51 @@ function CatalogContent() {
   const [categoryFilter, setCategoryFilter] = useState(urlCategory);
   const [typeFilter, setTypeFilter] = useState(urlType);
   const [statusFilter, setStatusFilter] = useState("all");
+
+  // Load vehicles from Supabase
+  useEffect(() => {
+    loadVehicles();
+  }, []);
+
+  const loadVehicles = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("vehicles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const transformedData = data.map((v: any) => ({
+        id: v.id,
+        name: v.name,
+        category: v.category,
+        listingType: v.listing_type,
+        price: v.price,
+        currency: v.currency,
+        rentalPeriod: v.price_period,
+        status: v.status,
+        image: v.image,
+        images: v.images || [],
+        reviews: v.reviews || [],
+        specs: v.specs || {},
+        description: v.description,
+        isFeatured: v.is_featured,
+        viewCount: v.view_count,
+        inquiries: v.inquiries,
+        seasonalPrice: v.seasonal_price,
+        discount: v.discount,
+        discountUntil: v.discount_until,
+      }));
+
+      setVehicles(transformedData);
+    } catch (error) {
+      console.error("Error loading vehicles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Sync filters with URL params when they change (SPA navigation)
   useEffect(() => {
@@ -235,7 +282,7 @@ function CatalogContent() {
         <div className="bg-primary text-primary-foreground py-12 md:py-16">
           <div className="container mx-auto px-4">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-balance">
-              <span className="text-gold">{getPageTitle()}</span>
+              <span className="text-gold">Vehicle Catalog</span>
             </h1>
             <p className="text-primary-foreground/70 text-lg max-w-2xl">
               Browse our premium collection of vehicles available in Sharm El Sheikh.
@@ -259,21 +306,23 @@ function CatalogContent() {
           />
 
           {/* Results Summary */}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-muted-foreground">
-              Showing{" "}
-              <span className="font-medium text-foreground">
-                {filteredVehicles.length}
-              </span>{" "}
-              vehicle{filteredVehicles.length !== 1 ? "s" : ""}
-            </p>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Filter className="w-4 h-4" />
-              {hasFilters ? "Filtered results" : "All vehicles"}
+          {!loading && (
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-muted-foreground">
+                Showing{" "}
+                <span className="font-medium text-foreground">
+                  {filteredVehicles.length}
+                </span>{" "}
+                vehicle{filteredVehicles.length !== 1 ? "s" : ""}
+              </p>
             </div>
-          </div>
+          )}
 
-          {filteredVehicles.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">Loading vehicles...</p>
+            </div>
+          ) : filteredVehicles.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
                 <Car className="w-8 h-8 text-muted-foreground" />
@@ -289,72 +338,18 @@ function CatalogContent() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-12">
-              {/* Cars Section */}
-              {cars.length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center">
-                      <Car className="w-5 h-5 text-gold" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-foreground">Cars</h2>
-                      <p className="text-sm text-muted-foreground">
-                        {cars.length} vehicle{cars.length !== 1 ? "s" : ""} available
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {cars.map((vehicle) => (
-                      <VehicleCard key={vehicle.id} vehicle={vehicle} />
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Scooters Section */}
-              {scooters.length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center">
-                      <Bike className="w-5 h-5 text-gold" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-foreground">Scooters</h2>
-                      <p className="text-sm text-muted-foreground">
-                        {scooters.length} vehicle{scooters.length !== 1 ? "s" : ""} available
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {scooters.map((vehicle) => (
-                      <VehicleCard key={vehicle.id} vehicle={vehicle} />
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Motorcycles Section */}
-              {motorcycles.length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center">
-                      <Bike className="w-5 h-5 text-gold" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-foreground">Motorcycles</h2>
-                      <p className="text-sm text-muted-foreground">
-                        {motorcycles.length} vehicle{motorcycles.length !== 1 ? "s" : ""} available
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {motorcycles.map((vehicle) => (
-                      <VehicleCard key={vehicle.id} vehicle={vehicle} />
-                    ))}
-                  </div>
-                </section>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredVehicles.map((vehicle) => (
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  priceDisplay={`${
+                    vehicle.currency === "EGP" ? "EGP " : "$"
+                  }${vehicle.price.toLocaleString()}${
+                    vehicle.listingType === "rent" ? `/${vehicle.rentalPeriod}` : ""
+                  }`}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -374,9 +369,5 @@ function CatalogPageContent() {
 }
 
 export default function CatalogPage() {
-  return (
-    <StoreProvider>
-      <CatalogPageContent />
-    </StoreProvider>
-  );
+  return <CatalogPageContent />;
 }
