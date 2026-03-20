@@ -152,31 +152,45 @@ function CatalogContent() {
 
       if (error) throw error;
 
-      const transformedData = data.map((v: any) => ({
-        id: v.id,
-        name: v.name,
-        category: v.category,
-        listingType: v.listing_type,
-        price: v.price,
-        currency: v.currency,
-        rentalPeriod: v.price_period,
-        status: v.status,
-        image: v.image,
-        images: v.images || [],
-        reviews: v.reviews || [],
-        specs: v.specs || {},
-        description: v.description,
-        isFeatured: v.is_featured,
-        viewCount: v.view_count,
-        inquiries: v.inquiries,
-        seasonalPrice: v.seasonal_price,
-        discount: v.discount,
-        discountUntil: v.discount_until,
-      }));
+      const transformedData = data.map((v: any): Vehicle => {
+        // Normalize all values to lowercase for consistent filtering
+        const vehicle: Vehicle = {
+          id: v.id,
+          name: v.name,
+          category: (String(v.category || "").toLowerCase().trim() || "car") as any,
+          listingType: (String(v.listing_type || "").toLowerCase().trim() || "rent") as any,
+          price: parseFloat(v.price) || 0,
+          currency: (String(v.currency || "USD").toUpperCase() || "USD") as any,
+          rentalPeriod: (String(v.price_period || "day").toLowerCase().trim() || "day") as any,
+          status: (String(v.status || "available").toLowerCase().trim() || "available") as any,
+          image: v.image || "",
+          images: v.images || [],
+          reviews: v.reviews || [],
+          specs: v.specs || {},
+          description: v.description || "",
+          isFeatured: v.is_featured || false,
+          viewCount: v.view_count || 0,
+          inquiries: v.inquiries || 0,
+          seasonalPrice: v.seasonal_price || null,
+          discount: v.discount || 0,
+          discountUntil: v.discount_until || null,
+        };
+        
+        // Debug log for first vehicle
+        if (data.indexOf(v) === 0) {
+          console.log("📊 Sample vehicle from Supabase:", {
+            raw: v,
+            transformed: vehicle,
+          });
+        }
+        
+        return vehicle;
+      });
 
+      console.log(`✅ Loaded ${transformedData.length} vehicles from Supabase`);
       setVehicles(transformedData);
     } catch (error) {
-      console.error("Error loading vehicles:", error);
+      console.error("❌ Error loading vehicles:", error);
     } finally {
       setLoading(false);
     }
@@ -223,28 +237,41 @@ function CatalogContent() {
 
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((vehicle) => {
-      // Search filter
+      // Normalize filter values to lowercase for comparison
+      const normCategoryFilter = categoryFilter.toLowerCase();
+      const normTypeFilter = typeFilter.toLowerCase();
+      const normStatusFilter = statusFilter.toLowerCase();
+
+      // Debug: Log filter state for first vehicle
+      if (vehicles.indexOf(vehicle) === 0) {
+        console.log("🔍 Filter debug:", {
+          filters: { category: normCategoryFilter, type: normTypeFilter, status: normStatusFilter },
+          vehicle: { category: vehicle.category, listingType: vehicle.listingType, status: vehicle.status },
+        });
+      }
+
+      // Search filter - case insensitive
       if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+        const query = searchQuery.toLowerCase().trim();
         const matchesSearch =
           vehicle.name.toLowerCase().includes(query) ||
           vehicle.description.toLowerCase().includes(query) ||
-          vehicle.specs.engine.toLowerCase().includes(query);
+          (vehicle.specs?.engine && vehicle.specs.engine.toLowerCase().includes(query));
         if (!matchesSearch) return false;
       }
 
-      // Category filter
-      if (categoryFilter !== "all" && vehicle.category !== categoryFilter) {
+      // Category filter - case insensitive
+      if (normCategoryFilter !== "all" && vehicle.category !== normCategoryFilter) {
         return false;
       }
 
-      // Type filter
-      if (typeFilter !== "all" && vehicle.listingType !== typeFilter) {
+      // Type filter - case insensitive
+      if (normTypeFilter !== "all" && vehicle.listingType !== normTypeFilter) {
         return false;
       }
 
-      // Status filter
-      if (statusFilter !== "all" && vehicle.status !== statusFilter) {
+      // Status filter - case insensitive
+      if (normStatusFilter !== "all" && vehicle.status !== normStatusFilter) {
         return false;
       }
 
@@ -268,7 +295,7 @@ function CatalogContent() {
     return "Vehicle Catalog";
   };
 
-  // Group by category for display
+  // Group by category for display (case-insensitive)
   const cars = filteredVehicles.filter((v) => v.category === "car");
   const scooters = filteredVehicles.filter((v) => v.category === "scooter");
   const motorcycles = filteredVehicles.filter((v) => v.category === "motorcycle");
@@ -343,11 +370,6 @@ function CatalogContent() {
                 <VehicleCard
                   key={vehicle.id}
                   vehicle={vehicle}
-                  priceDisplay={`${
-                    vehicle.currency === "EGP" ? "EGP " : "$"
-                  }${vehicle.price.toLocaleString()}${
-                    vehicle.listingType === "rent" ? `/${vehicle.rentalPeriod}` : ""
-                  }`}
                 />
               ))}
             </div>
