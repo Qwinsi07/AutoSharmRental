@@ -11,7 +11,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Cars for Sale", href: "/catalog?type=sale&category=car" },
   { label: "Cars for Rent", href: "/catalog?type=rent&category=car" },
-  { label: "Scooter for Rent", href: "/catalog?type=rent&category=scooter" },
+  { label: "Bikes & Scooters", href: "/catalog?category=bikes" },
 ];
 
 export function Header() {

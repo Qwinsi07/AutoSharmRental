@@ -69,14 +69,9 @@ function CatalogFilters({
                   <Car className="w-4 h-4" /> Cars
                 </div>
               </SelectItem>
-              <SelectItem value="motorcycle">
+              <SelectItem value="bikes">
                 <div className="flex items-center gap-2">
-                  <Bike className="w-4 h-4" /> Motorcycles
-                </div>
-              </SelectItem>
-              <SelectItem value="scooter">
-                <div className="flex items-center gap-2">
-                  <Bike className="w-4 h-4" /> Scooters
+                  <Bike className="w-4 h-4" /> Bikes & Scooters
                 </div>
               </SelectItem>
             </SelectContent>
@@ -261,8 +256,17 @@ function CatalogContent() {
       }
 
       // Category filter - case insensitive
-      if (normCategoryFilter !== "all" && vehicle.category !== normCategoryFilter) {
-        return false;
+      // Special handling for "bikes" category = motorcycle OR scooter
+      if (normCategoryFilter !== "all") {
+        if (normCategoryFilter === "bikes") {
+          if (vehicle.category !== "motorcycle" && vehicle.category !== "scooter") {
+            return false;
+          }
+        } else {
+          if (vehicle.category !== normCategoryFilter) {
+            return false;
+          }
+        }
       }
 
       // Type filter - case insensitive
@@ -281,23 +285,26 @@ function CatalogContent() {
 
   // Dynamic page title based on filters
   const getPageTitle = () => {
+    if (categoryFilter === "bikes" && typeFilter === "rent") return "Bikes & Scooters for Rent";
+    if (categoryFilter === "bikes" && typeFilter === "sale") return "Bikes & Scooters for Sale";
+    if (categoryFilter === "bikes") return "Bikes & Scooters";
     if (categoryFilter === "car" && typeFilter === "sale") return "Cars for Sale";
     if (categoryFilter === "car" && typeFilter === "rent") return "Cars for Rent";
+    if (categoryFilter === "car") return "Cars";
     if (categoryFilter === "scooter" && typeFilter === "rent") return "Scooters for Rent";
+    if (categoryFilter === "scooter" && typeFilter === "sale") return "Scooters for Sale";
+    if (categoryFilter === "scooter") return "Scooters";
     if (categoryFilter === "motorcycle" && typeFilter === "rent") return "Motorcycles for Rent";
     if (categoryFilter === "motorcycle" && typeFilter === "sale") return "Motorcycles for Sale";
-    if (categoryFilter === "scooter" && typeFilter === "sale") return "Scooters for Sale";
+    if (categoryFilter === "motorcycle") return "Motorcycles";
     if (typeFilter === "rent") return "Vehicles for Rent";
     if (typeFilter === "sale") return "Vehicles for Sale";
-    if (categoryFilter === "car") return "Cars";
-    if (categoryFilter === "scooter") return "Scooters";
-    if (categoryFilter === "motorcycle") return "Motorcycles";
     return "Vehicle Catalog";
   };
 
   // Group by category for display (case-insensitive)
   const cars = filteredVehicles.filter((v) => v.category === "car");
-  const scooters = filteredVehicles.filter((v) => v.category === "scooter");
+  const bikes = filteredVehicles.filter((v) => v.category === "motorcycle" || v.category === "scooter");
   const motorcycles = filteredVehicles.filter((v) => v.category === "motorcycle");
 
   return (
@@ -331,6 +338,39 @@ function CatalogContent() {
             clearFilters={clearFilters}
             hasFilters={hasFilters}
           />
+
+          {/* Bikes & Scooters - Rent/Sale Quick Toggle */}
+          {categoryFilter === "bikes" && (
+            <div className="bg-card rounded-xl border border-border p-4 mb-6">
+              <p className="text-sm font-medium text-foreground mb-3">Quick Filter:</p>
+              <div className="flex gap-3">
+                <Button
+                  variant={typeFilter === "all" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeChange("all")}
+                  className={typeFilter === "all" ? "bg-gold text-gold-foreground" : ""}
+                >
+                  All Bikes & Scooters
+                </Button>
+                <Button
+                  variant={typeFilter === "rent" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeChange("rent")}
+                  className={typeFilter === "rent" ? "bg-gold text-gold-foreground" : ""}
+                >
+                  For Rent
+                </Button>
+                <Button
+                  variant={typeFilter === "sale" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeChange("sale")}
+                  className={typeFilter === "sale" ? "bg-gold text-gold-foreground" : ""}
+                >
+                  For Sale
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Results Summary */}
           {!loading && (
