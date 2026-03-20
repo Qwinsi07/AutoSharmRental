@@ -147,13 +147,23 @@ function CatalogContent() {
 
       if (error) throw error;
 
+      if (!data || data.length === 0) {
+        console.log("✅ No vehicles found in Supabase");
+        setVehicles([]);
+        setLoading(false);
+        return;
+      }
+
       const transformedData = data.map((v: any): Vehicle => {
         // Normalize all values to lowercase for consistent filtering
+        const category = String(v.category || "car").toLowerCase().trim();
+        const listingType = String(v.listing_type || "rent").toLowerCase().trim();
+        
         const vehicle: Vehicle = {
           id: v.id,
           name: v.name,
-          category: (String(v.category || "").toLowerCase().trim() || "car") as any,
-          listingType: (String(v.listing_type || "").toLowerCase().trim() || "rent") as any,
+          category: category as any,
+          listingType: listingType as any,
           price: parseFloat(v.price) || 0,
           currency: (String(v.currency || "USD").toUpperCase() || "USD") as any,
           rentalPeriod: (String(v.price_period || "day").toLowerCase().trim() || "day") as any,
@@ -171,21 +181,18 @@ function CatalogContent() {
           discountUntil: v.discount_until || null,
         };
         
-        // Debug log for first vehicle
-        if (data.indexOf(v) === 0) {
-          console.log("📊 Sample vehicle from Supabase:", {
-            raw: v,
-            transformed: vehicle,
-          });
-        }
-        
         return vehicle;
       });
 
       console.log(`✅ Loaded ${transformedData.length} vehicles from Supabase`);
+      console.log("📊 Sample vehicle from Supabase:", {
+        raw: data[0],
+        transformed: transformedData[0],
+      });
       setVehicles(transformedData);
     } catch (error) {
       console.error("❌ Error loading vehicles:", error);
+      setVehicles([]);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { supabase } from "./supabase";
 import {
   Vehicle,
   NewsItem,
@@ -123,12 +124,59 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [analytics, setAnalytics] = useState<AnalyticsData[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Initialize from localStorage on mount
+  // Load vehicles from Supabase on mount
   useEffect(() => {
-    try {
-      const storedVehicles = localStorage.getItem(STORAGE_KEYS.VEHICLES);
-      if (storedVehicles) setVehicles(JSON.parse(storedVehicles));
+    const loadVehiclesFromSupabase = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("vehicles")
+          .select("*")
+          .order("created_at", { ascending: false });
 
+        if (error) {
+          console.error("Error loading vehicles from Supabase:", error);
+          // Fall back to initialVehicles
+          setVehicles(initialVehicles);
+        } else if (data && data.length > 0) {
+          // Transform Supabase data to Vehicle format
+          const transformedVehicles: Vehicle[] = data.map((v: any) => ({
+            id: v.id,
+            name: v.name,
+            category: v.category || "car",
+            listingType: v.listing_type || "rent",
+            price: parseFloat(v.price) || 0,
+            currency: v.currency || "USD",
+            rentalPeriod: v.price_period || "day",
+            status: v.status || "available",
+            image: v.image || "",
+            images: v.images || [],
+            reviews: v.reviews || [],
+            specs: v.specs || {},
+            description: v.description || "",
+            isFeatured: v.is_featured || false,
+            viewCount: v.view_count || 0,
+            inquiries: v.inquiries || 0,
+            seasonalPrice: v.seasonal_price || null,
+            discount: v.discount || 0,
+            discountUntil: v.discount_until || null,
+          }));
+          console.log(
+            `✅ Loaded ${transformedVehicles.length} vehicles from Supabase`
+          );
+          setVehicles(transformedVehicles);
+        } else {
+          setVehicles(initialVehicles);
+        }
+      } catch (error) {
+        console.error("Error in loadVehiclesFromSupabase:", error);
+        setVehicles(initialVehicles);
+      }
+    };
+
+    loadVehiclesFromSupabase();
+
+    // Load other data from localStorage
+    try {
       const storedNews = localStorage.getItem(STORAGE_KEYS.NEWS);
       if (storedNews) setNews(JSON.parse(storedNews));
 
@@ -155,16 +203,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setIsHydrated(true);
   }, []);
 
-  // Save to localStorage whenever data changes
-  useEffect(() => {
-    if (isHydrated) {
-      try {
-        localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
-      } catch (error) {
-        console.error("Error saving vehicles to localStorage:", error);
-      }
-    }
-  }, [vehicles, isHydrated]);
+  // Remove the localStorage save effect for vehicles - Supabase is source of truth
+  // (Keeping other localStorage effects for non-vehicle data)
 
   useEffect(() => {
     if (isHydrated) {
@@ -236,46 +276,171 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [analytics, isHydrated]);
 
-  // Vehicle management
+  // Vehicle management - Supabase as source of truth (async operations in background)
   const addVehicle = (vehicle: Omit<Vehicle, "id">) => {
     const newVehicle: Vehicle = {
       ...vehicle,
-      id: Date.now().toString(),
+      id: `temp_${Date.now()}`, // Temporary ID, will be replaced by Supabase ID
       viewCount: 0,
       inquiries: 0,
       isFeatured: false,
     };
     setVehicles((prev) => [...prev, newVehicle]);
+
+    // Queue Supabase operation in background
+    (async () => {
+      try {
+        const vehicleData = {
+          name: vehicle.name,
+          category: vehicle.category,
+          listing_type: vehicle.listingType,
+          price: vehicle.price,
+          currency: vehicle.currency,
+          price_period: vehicle.rentalPeriod,
+          status: vehicle.status,
+          image: vehicle.image,
+          images: vehicle.images,
+          reviews: vehicle.reviews,
+          specs: vehicle.specs,
+          description: vehicle.description,
+          is_featured: vehicle.isFeatured,
+          view_count: vehicle.viewCount || 0,
+          inquiries: vehicle.inquiries || 0,
+          seasonal_price: vehicle.seasonalPrice,
+          discount: vehicle.discount,
+          discount_until: vehicle.discountUntil,
+        };
+
+        const { data, error } = await supabase
+          .from("vehicles")
+          .insert([vehicleData])
+          .select()
+          .single();
+
+        if (error) {
+          console.error("❌ Error adding vehicle to Supabase:", error);
+          // Remove the temporary vehicle if it failed
+          setVehicles((prev) => prev.filter((v) => v.id !== newVehicle.id));
+          return;
+        }
+
+        // Replace temporary vehicle with real one from Supabase
+        const savedVehicle: Vehicle = {
+          id: data.id,
+          name: data.name,
+          category: data.category || "car",
+          listingType: data.listing_type || "rent",
+          price: parseFloat(data.price) || 0,
+          currency: data.currency || "USD",
+          rentalPeriod: data.price_period || "day",
+          status: data.status || "available",
+          image: data.image || "",
+          images: data.images || [],
+          reviews: data.reviews || [],
+          specs: data.specs || {},
+          description: data.description || "",
+          isFeatured: data.is_featured || false,
+          viewCount: data.view_count || 0,
+          inquiries: data.inquiries || 0,
+          seasonalPrice: data.seasonal_price || null,
+          discount: data.discount || 0,
+          discountUntil: data.discount_until || null,
+        };
+
+        setVehicles((prev) =>
+          prev.map((v) => (v.id === newVehicle.id ? savedVehicle : v))
+        );
+        console.log("✅ Vehicle saved to Supabase:", savedVehicle);
+      } catch (error) {
+        console.error("🔥 Error in addVehicle background operation:", error);
+        setVehicles((prev) => prev.filter((v) => v.id !== newVehicle.id));
+      }
+    })();
   };
 
   const updateVehicle = (id: string, updates: Partial<Vehicle>) => {
+    // Update local state immediately for responsive UI
     setVehicles((prev) =>
       prev.map((v) => (v.id === id ? { ...v, ...updates } : v))
     );
+
+    // Queue Supabase operation in background
+    (async () => {
+      try {
+        const updateData: Record<string, any> = {};
+        if (updates.name !== undefined) updateData.name = updates.name;
+        if (updates.category !== undefined) updateData.category = updates.category;
+        if (updates.listingType !== undefined) updateData.listing_type = updates.listingType;
+        if (updates.price !== undefined) updateData.price = updates.price;
+        if (updates.currency !== undefined) updateData.currency = updates.currency;
+        if (updates.rentalPeriod !== undefined) updateData.price_period = updates.rentalPeriod;
+        if (updates.status !== undefined) updateData.status = updates.status;
+        if (updates.image !== undefined) updateData.image = updates.image;
+        if (updates.images !== undefined) updateData.images = updates.images;
+        if (updates.reviews !== undefined) updateData.reviews = updates.reviews;
+        if (updates.specs !== undefined) updateData.specs = updates.specs;
+        if (updates.description !== undefined) updateData.description = updates.description;
+        if (updates.isFeatured !== undefined) updateData.is_featured = updates.isFeatured;
+        if (updates.viewCount !== undefined) updateData.view_count = updates.viewCount;
+        if (updates.inquiries !== undefined) updateData.inquiries = updates.inquiries;
+        if (updates.seasonalPrice !== undefined) updateData.seasonal_price = updates.seasonalPrice;
+        if (updates.discount !== undefined) updateData.discount = updates.discount;
+        if (updates.discountUntil !== undefined) updateData.discount_until = updates.discountUntil;
+
+        const { error } = await supabase
+          .from("vehicles")
+          .update(updateData)
+          .eq("id", id);
+
+        if (error) {
+          console.error("❌ Error updating vehicle in Supabase:", error);
+          return;
+        }
+
+        console.log("✅ Vehicle updated in Supabase:", id);
+      } catch (error) {
+        console.error("🔥 Error in updateVehicle background operation:", error);
+      }
+    })();
   };
 
   const deleteVehicle = (id: string) => {
+    // Update local state immediately for responsive UI
     setVehicles((prev) => prev.filter((v) => v.id !== id));
+
+    // Queue Supabase operation in background
+    (async () => {
+      try {
+        const { error } = await supabase
+          .from("vehicles")
+          .delete()
+          .eq("id", id);
+
+        if (error) {
+          console.error("❌ Error deleting vehicle from Supabase:", error);
+          return;
+        }
+
+        console.log("✅ Vehicle deleted from Supabase:", id);
+      } catch (error) {
+        console.error("🔥 Error in deleteVehicle background operation:", error);
+      }
+    })();
   };
 
   const updateVehicleStatus = (id: string, status: VehicleStatus) => {
-    setVehicles((prev) =>
-      prev.map((v) => (v.id === id ? { ...v, status } : v))
-    );
+    updateVehicle(id, { status });
   };
 
   const toggleFeatured = (id: string) => {
-    setVehicles((prev) =>
-      prev.map((v) =>
-        v.id === id ? { ...v, isFeatured: !v.isFeatured } : v
-      )
-    );
+    const vehicle = vehicles.find((v) => v.id === id);
+    if (vehicle) {
+      updateVehicle(id, { isFeatured: !vehicle.isFeatured });
+    }
   };
 
   const updateViewCount = (id: string, count: number) => {
-    setVehicles((prev) =>
-      prev.map((v) => (v.id === id ? { ...v, viewCount: count } : v))
-    );
+    updateVehicle(id, { viewCount: count });
   };
 
   // News management
