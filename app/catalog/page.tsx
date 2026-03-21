@@ -237,55 +237,48 @@ function CatalogContent() {
     router.push("/catalog", { scroll: false });
   };
  
- const filteredVehicles = useMemo(() => {
+  const filteredVehicles = useMemo(() => {
     return vehicles.filter((vehicle) => {
-      // 1. Поиск по названию (уже работает нормально)
+      // Подготовка данных для сравнения (убираем пробелы и регистр)
+      const vCategory = String(vehicle.category || "").toLowerCase().trim();
+      const vListingType = String(vehicle.listingType || "").toLowerCase().trim();
+      const vStatus = String(vehicle.status || "").toLowerCase().trim();
+      
+      const fCategory = categoryFilter.toLowerCase().trim();
+      const fType = typeFilter.toLowerCase().trim();
+      const fStatus = statusFilter.toLowerCase().trim();
+
+      // 1. Поиск по тексту
       if (searchQuery) {
         const query = searchQuery.toLowerCase().trim();
-        const matchesSearch =
-          vehicle.name.toLowerCase().includes(query) ||
+        const matchesSearch = 
+          vehicle.name.toLowerCase().includes(query) || 
           vehicle.description.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
 
-      // 2. ИСПРАВЛЕННЫЙ ФИЛЬТР КАТЕГОРИЙ
-      if (categoryFilter !== "all") {
-        const cat = categoryFilter.toLowerCase();
-        
-        if (cat === "bikes") {
-          // Если выбрано "Bikes & Scooters", показываем и то, и другое
-          // Важно: проверяем соответствие тем именам, что в базе (motorcycle/scooter)
-          if (vehicle.category !== "motorcycle" && vehicle.category !== "scooter") {
-            return false;
-          }
+      // 2. Категория (Cars / Bikes & Scooters)
+      if (fCategory !== "all") {
+        if (fCategory === "bikes") {
+          // Проверяем оба варианта, которые могут быть в базе
+          if (vCategory !== "motorcycle" && vCategory !== "scooter") return false;
         } else {
-          // Для остальных (например, 'car')
-          if (vehicle.category !== cat) {
-            return false;
-          }
+          if (vCategory !== fCategory) return false;
         }
       }
 
-      // 3. ФИЛЬТР ТИПА (RENT/SALE)
-      if (typeFilter !== "all") {
-        const t = typeFilter.toLowerCase();
-        // В базе listing_type может быть 'for rent' или 'for sale'
-        // Убедимся, что сравнение учитывает это
-        const vehicleType = vehicle.listingType.toLowerCase();
-        
-        if (t === "rent" && !vehicleType.includes("rent")) return false;
-        if (t === "sale" && !vehicleType.includes("sale")) return false;
+      // 3. Тип сделки (Rent / Sale)
+      if (fType !== "all") {
+        // Проверяем вхождение слова, чтобы 'For Rent' и 'rent' совпадали
+        if (!vListingType.includes(fType)) return false;
       }
 
-      // 4. ФИЛЬТР СТАТУСА
-      if (statusFilter !== "all" && vehicle.status !== statusFilter.toLowerCase()) {
-        return false;
-      }
+      // 4. Статус
+      if (fStatus !== "all" && vStatus !== fStatus) return false;
 
       return true;
     });
   }, [vehicles, searchQuery, categoryFilter, typeFilter, statusFilter]);
-
   // Dynamic page title based on filters
   const getPageTitle = () => {
     if (categoryFilter === "bikes" && typeFilter === "rent") return "Bikes & Scooters for Rent";
