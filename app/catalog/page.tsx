@@ -236,39 +236,61 @@ function CatalogContent() {
     setStatusFilter("all");
     router.push("/catalog", { scroll: false });
   };
- 
+
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((vehicle) => {
-      // Приводим всё к нижнему регистру для сравнения
-      const vCat = String(vehicle.category || "").toLowerCase().trim();
-      const vType = String(vehicle.listingType || "").toLowerCase().trim();
-      
-      // 1. Поиск по названию
-      if (searchQuery && !vehicle.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
+      // Normalize filter values to lowercase for comparison
+      const normCategoryFilter = categoryFilter.toLowerCase();
+      const normTypeFilter = typeFilter.toLowerCase();
+      const normStatusFilter = statusFilter.toLowerCase();
+
+      // Debug: Log filter state for first vehicle
+      if (vehicles.indexOf(vehicle) === 0) {
+        console.log("🔍 Filter debug:", {
+          filters: { category: normCategoryFilter, type: normTypeFilter, status: normStatusFilter },
+          vehicle: { category: vehicle.category, listingType: vehicle.listingType, status: vehicle.status },
+        });
       }
 
-      // 2. Исправляем категории (Bikes & Scooters)
-      if (categoryFilter !== "all") {
-        const fCat = categoryFilter.toLowerCase();
-        if (fCat === "bikes") {
-          // Разрешаем и мотоциклы, и скутеры из твоей админки
-          if (vCat !== "motorcycle" && vCat !== "scooter") return false;
-        } else if (vCat !== fCat) {
-          return false;
+      // Search filter - case insensitive
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase().trim();
+        const matchesSearch =
+          vehicle.name.toLowerCase().includes(query) ||
+          vehicle.description.toLowerCase().includes(query) ||
+          (vehicle.specs?.engine && vehicle.specs.engine.toLowerCase().includes(query));
+        if (!matchesSearch) return false;
+      }
+
+      // Category filter - case insensitive
+      // Special handling for "bikes" category = motorcycle OR scooter
+      if (normCategoryFilter !== "all") {
+        if (normCategoryFilter === "bikes") {
+          if (vehicle.category !== "motorcycle" && vehicle.category !== "scooter") {
+            return false;
+          }
+        } else {
+          if (vehicle.category !== normCategoryFilter) {
+            return false;
+          }
         }
       }
 
-      // 3. Исправляем тип (Rent / Sale)
-      if (typeFilter !== "all") {
-        const fType = typeFilter.toLowerCase();
-        // Используем .includes(), чтобы 'for rent' подходило под 'rent'
-        if (!vType.includes(fType)) return false;
+      // Type filter - case insensitive
+      if (normTypeFilter !== "all" && vehicle.listingType !== normTypeFilter) {
+        return false;
+      }
+
+      // Status filter - case insensitive
+      if (normStatusFilter !== "all" && vehicle.status !== normStatusFilter) {
+        return false;
       }
 
       return true;
     });
   }, [vehicles, searchQuery, categoryFilter, typeFilter, statusFilter]);
+
+  // Dynamic page title based on filters
   const getPageTitle = () => {
     if (categoryFilter === "bikes" && typeFilter === "rent") return "Bikes & Scooters for Rent";
     if (categoryFilter === "bikes" && typeFilter === "sale") return "Bikes & Scooters for Sale";
