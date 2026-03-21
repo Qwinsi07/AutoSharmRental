@@ -236,53 +236,49 @@ function CatalogContent() {
     setStatusFilter("all");
     router.push("/catalog", { scroll: false });
   };
-
-  const filteredVehicles = useMemo(() => {
+ 
+ const filteredVehicles = useMemo(() => {
     return vehicles.filter((vehicle) => {
-      // Normalize filter values to lowercase for comparison
-      const normCategoryFilter = categoryFilter.toLowerCase();
-      const normTypeFilter = typeFilter.toLowerCase();
-      const normStatusFilter = statusFilter.toLowerCase();
-
-      // Debug: Log filter state for first vehicle
-      if (vehicles.indexOf(vehicle) === 0) {
-        console.log("🔍 Filter debug:", {
-          filters: { category: normCategoryFilter, type: normTypeFilter, status: normStatusFilter },
-          vehicle: { category: vehicle.category, listingType: vehicle.listingType, status: vehicle.status },
-        });
-      }
-
-      // Search filter - case insensitive
+      // 1. Поиск по названию (уже работает нормально)
       if (searchQuery) {
         const query = searchQuery.toLowerCase().trim();
         const matchesSearch =
           vehicle.name.toLowerCase().includes(query) ||
-          vehicle.description.toLowerCase().includes(query) ||
-          (vehicle.specs?.engine && vehicle.specs.engine.toLowerCase().includes(query));
+          vehicle.description.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
 
-      // Category filter - case insensitive
-      // Special handling for "bikes" category = motorcycle OR scooter
-      if (normCategoryFilter !== "all") {
-        if (normCategoryFilter === "bikes") {
+      // 2. ИСПРАВЛЕННЫЙ ФИЛЬТР КАТЕГОРИЙ
+      if (categoryFilter !== "all") {
+        const cat = categoryFilter.toLowerCase();
+        
+        if (cat === "bikes") {
+          // Если выбрано "Bikes & Scooters", показываем и то, и другое
+          // Важно: проверяем соответствие тем именам, что в базе (motorcycle/scooter)
           if (vehicle.category !== "motorcycle" && vehicle.category !== "scooter") {
             return false;
           }
         } else {
-          if (vehicle.category !== normCategoryFilter) {
+          // Для остальных (например, 'car')
+          if (vehicle.category !== cat) {
             return false;
           }
         }
       }
 
-      // Type filter - case insensitive
-      if (normTypeFilter !== "all" && vehicle.listingType !== normTypeFilter) {
-        return false;
+      // 3. ФИЛЬТР ТИПА (RENT/SALE)
+      if (typeFilter !== "all") {
+        const t = typeFilter.toLowerCase();
+        // В базе listing_type может быть 'for rent' или 'for sale'
+        // Убедимся, что сравнение учитывает это
+        const vehicleType = vehicle.listingType.toLowerCase();
+        
+        if (t === "rent" && !vehicleType.includes("rent")) return false;
+        if (t === "sale" && !vehicleType.includes("sale")) return false;
       }
 
-      // Status filter - case insensitive
-      if (normStatusFilter !== "all" && vehicle.status !== normStatusFilter) {
+      // 4. ФИЛЬТР СТАТУСА
+      if (statusFilter !== "all" && vehicle.status !== statusFilter.toLowerCase()) {
         return false;
       }
 
